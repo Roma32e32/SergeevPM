@@ -1,9 +1,21 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.11'",
     "python_full_version < '3.11'",
+]
+
+[[package]]
+name = "aes-bridge"
+version = "2.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5f/c1/ae7dfb7fbc84d48948e0d2d80878e5046211c98522045055d44332224924/aes_bridge-2.0.4.tar.gz", hash = "sha256:72d85d289ac4678adad173c94e938c6061138f29a85462d93505f094acbc9ca1", size = 7881, upload-time = "2025-07-22T16:20:14.381Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/ca/b2b362c4b606d21bce706944f149bf489e0d00502cdb475a6247a0e1f7bb/aes_bridge-2.0.4-py3-none-any.whl", hash = "sha256:a6e3fbd83fbdd9491fd85d578e6b28fb19388676cb1c621442ed3282f51ccb6b", size = 11773, upload-time = "2025-07-22T16:20:13.015Z" },
 ]
 
 [[package]]
@@ -282,6 +294,7 @@ name = "sergeevpm"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aes-bridge" },
     { name = "cryptography" },
     { name = "customtkinter" },
     { name = "pynacl" },
@@ -289,6 +302,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aes-bridge", specifier = ">=2.0.4" },
     { name = "cryptography", specifier = ">=50.0.2" },
     { name = "customtkinter", specifier = ">=6.0.0" },
     { name = "pynacl", specifier = ">=1.6.2" },
