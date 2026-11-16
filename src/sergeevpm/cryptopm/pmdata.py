@@ -1,10 +1,11 @@
-from aes_bridge import encrypt, decrypt
-from dataclasses import dataclass
+from nicegui import binding
 
 
-@dataclass
-class PMData:
-    sites: list[str]
-    logins: list[str]
-    tags: list[list[str]]
-    pwds: list[str]
+@binding.bindable_dataclass
+class Record:
+    """Строка менеджера паролей. Поля биндятся к элементам NiceGUI напрямую."""
+
+    site: str = ''
+    login: str = ''
+    tags: str = ''
+    password: str = ''

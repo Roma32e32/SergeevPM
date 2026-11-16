@@ -1,6 +1,11 @@
+from pathlib import Path
+
+from aes_bridge import decrypt, encrypt
+
 from .conv import data_from_csv, data_to_csv
-from aes_bridge import encrypt, decrypt
+from .pmdata import Record
 from .search import search
+
 
 def check_password(data, password):
     decoded_password = decrypt(data, password).decode("utf-8")
@@ -10,37 +15,19 @@ def check_password(data, password):
 
 class PM:
     def __init__(self, path, password):
-        self.__file = open(path, "r+")
+        self.__path = path
         self.__password = password
 
-        raw = self.__file.read()
-        decrypted = decrypt(raw, self.__password).decode("utf-8")
-        data = data_from_csv(decrypted)
-        self.__data = data
+        decrypted = decrypt(Path(path).read_text(encoding="utf-8"), self.__password).decode("utf-8")
+        self.records = data_from_csv(decrypted)
 
-    def ___write_to_file(self):
-        csv = data_to_csv(self.__data)
-        crypted = encrypt(csv, self.__password)
-        self.__file.write(crypted)
+    def save(self):
+        data = encrypt(data_to_csv(self.records), self.__password)
+        Path(self.__path).write_bytes(data)
 
-    def set_site(self, i, new_site):
-        self.__data.sites[i] = new_site
-        self.___write_to_file()
+    def add_record(self):
+        self.records.append(Record())
+        self.save()
 
-    def set_login(self, i, new_login):
-        self.__data.logins[i] = new_login
-        self.___write_to_file()
-
-    def set_tags(self, i, new_tags):
-        self.__data.tags[i] = new_tags.split(",")
-        self.___write_to_file()
-
-    def set_pass(self, i, new_pass):
-        self.__data.pwds[i] = new_pass
-        self.___write_to_file()
-
-    def get_record(self, i):
-        return self.__data.sites[i], self.__data.logins[i], self.__data.tags[i], self.__data.pwds[i]
-
-    def find(self, site=-1, login=-1, tags=-1):
-        return search(self.__data, site, login, tags)
+    def find(self, site=None, login=None, tags=None):
+        return search(self.records, site, login, tags)

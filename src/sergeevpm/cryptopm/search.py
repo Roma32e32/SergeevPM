@@ -1,41 +1,47 @@
-import math
 from rapidfuzz import fuzz, process
-from .pmdata import PMData
+
+from .pmdata import Record
 
 
-def search_by_site(data: PMData, site: str) -> list[int]:
-    matches = process.extract(query=site, choices=data.sites, scorer=fuzz.partial_ratio, score_cutoff=95)
-    matches = [m[2] for m in matches]
-    return matches
+def _record_tags(record: Record) -> list[str]:
+    return [tag.strip() for tag in record.tags.split(",") if tag.strip()]
 
-def search_by_login(data: PMData, login: str) -> list[int]:
-    matches = process.extract(query=login, choices=data.logins, scorer=fuzz.partial_ratio, score_cutoff=85)
-    matches = [m[2] for m in matches]
-    return matches
 
-def search_by_tag(data: PMData, tag: str) -> list[int]:
-    matches = [process.extract(query=tag, choices=t, scorer=fuzz.partial_ratio, score_cutoff=90) for t in data.tags]
-    out = [i for i, e in enumerate(matches) if e != []]
-    return out
+def search_by_site(records: list[Record], site: str) -> list[int]:
+    matches = process.extract(query=site, choices=[record.site for record in records],
+                              scorer=fuzz.partial_ratio, score_cutoff=95)
+    return [match[2] for match in matches]
 
-def search_by_tags(data: PMData, tags: list[str]) -> list[int]:
-    pre = [search_by_tag(data, tag) for tag in tags]
-    every = set(list(range(len(data.sites))))
-    for e in pre:
-        every &= set(e)
-    return list(every)
 
-def search(data: PMData, site: str = -1, login: str = -1, tags: list[str] = -1) -> list[int]:
-    #by_site = set(search_by_site(data, site))
-    #by_login = set(search_by_login(data, login))
-    #by_tags = set(search_by_tags(data, tags))
+def search_by_login(records: list[Record], login: str) -> list[int]:
+    matches = process.extract(query=login, choices=[record.login for record in records],
+                              scorer=fuzz.partial_ratio, score_cutoff=85)
+    return [match[2] for match in matches]
 
-    every = set(list(range(len(data.sites))))
-    if site != -1:
-        every &= set(search_by_site(data, site))
-    if login != -1:
-        every &= set(search_by_login(data, login))
-    if tags != -1:
-        every &= set(search_by_tags(data, tags))
 
-    return list(every)
+def search_by_tag(records: list[Record], tag: str) -> list[int]:
+    matches = [
+        process.extract(query=tag, choices=_record_tags(record), scorer=fuzz.partial_ratio, score_cutoff=90)
+        for record in records
+    ]
+    return [index for index, match in enumerate(matches) if match]
+
+
+def search_by_tags(records: list[Record], tags: list[str]) -> list[int]:
+    found = set(range(len(records)))
+    for tag in tags:
+        found &= set(search_by_tag(records, tag))
+    return list(found)
+
+
+def search(records: list[Record], site: str | None = None, login: str | None = None,
+           tags: list[str] | None = None) -> list[int]:
+    found = set(range(len(records)))
+    if site is not None:
+        found &= set(search_by_site(records, site))
+    if login is not None:
+        found &= set(search_by_login(records, login))
+    if tags is not None:
+        found &= set(search_by_tags(records, tags))
+
+    return sorted(found)

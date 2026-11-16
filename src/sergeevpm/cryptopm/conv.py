@@ -1,16 +1,12 @@
-from .pmdata import PMData
+from .pmdata import Record
 
 
-def data_from_csv(csv: str) -> PMData:
-    lines = csv.split('\n')[1:]
-    sites = [line.split(";")[0] for line in lines]
-    logins = [line.split(";")[1] for line in lines]
-    tags = [line.split(";")[2] for line in lines]
-    tags = [tag.split(",") for tag in tags]
-    pwds = [line.split(";")[3] for line in lines]
-    return PMData(sites, logins, tags, pwds)
+def data_from_csv(csv: str) -> list[Record]:
+    lines = csv.splitlines()[1:]
+    return [Record(*line.split(';', 3)) for line in lines if line]
 
-def data_to_csv(data: PMData) -> str:
+
+def data_to_csv(records: list[Record]) -> str:
     header = "site;login;tags;pass"
-    lines = [f"\n{data.sites[i]};{data.logins[i]};{",".join(data.tags[i])};{data.pwds[i]}" for i in range(len(data.pwds))]
+    lines = [f"\n{record.site};{record.login};{record.tags};{record.password}" for record in records]
     return header + "".join(lines)
