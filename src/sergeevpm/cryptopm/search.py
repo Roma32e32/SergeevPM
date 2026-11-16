@@ -1,6 +1,6 @@
 import math
 from rapidfuzz import fuzz, process
-from pmdata import PMData
+from .pmdata import PMData
 
 
 def search_by_site(data: PMData, site: str) -> list[int]:

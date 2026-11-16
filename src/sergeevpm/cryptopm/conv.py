@@ -1,4 +1,4 @@
-from pmdata import PMData
+from .pmdata import PMData
 
 
 def data_from_csv(csv: str) -> PMData:

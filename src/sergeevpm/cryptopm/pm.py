@@ -1,7 +1,6 @@
-from pmdata import PMData
-from conv import data_from_csv, data_to_csv
+from .conv import data_from_csv, data_to_csv
 from aes_bridge import encrypt, decrypt
-from search import search
+from .search import search
 
 def check_password(data, password):
     decoded_password = decrypt(data, password).decode("utf-8")
@@ -10,8 +9,8 @@ def check_password(data, password):
 
 
 class PM:
-    def __init__(self, file, password):
-        self.__file = file
+    def __init__(self, path, password):
+        self.__file = open(path, "r+")
         self.__password = password
 
         raw = self.__file.read()

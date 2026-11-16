@@ -1,46 +1,51 @@
-import customtkinter as ctk
-from tkinter import filedialog
-from frames import OpenFrame, DecryptFrame, ManagerFrame
+from nicegui import ui
+import global_data
+from cryptopm.pm import PM
+import cryptography
 
+def nav():
+    with ui.header():
+        ui.button('Главная', on_click=lambda: ui.navigate.to('/'))
+        ui.button('Открыть файл', on_click=lambda: ui.navigate.to('/open'))
+        ui.button('Манеджер Паролей', on_click=lambda: ui.navigate.to('/pm'))
+        ui.button('Генератор Паролей', on_click=lambda: ui.navigate.to('gen'))
 
+@ui.page('/')
+def home():
+    nav()
+    ui.label('Сие замечательное приложение сделано студентом')
+    ui.label('ИСП-225п')
+    ui.label('Сергеевым Романом')
+    ui.label('В рамках учебной практики 04')
 
+def new_pm():
+    try:
+        global_data.PWM = PM(global_data.PATH, global_data.PASS)
+    except cryptography.exceptions.InvalidTag:
+        ui.notify('Неверный пароль')
+    except FileNotFoundError:
+        ui.notify('Такого файла нет')
+    else:
+        ui.notify('Файл успешно открыт и расшифрован')
 
-class App(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-        self.title("Переключение фреймов")
-        self.geometry("900x600")
+@ui.page('/open')
+def open_pwm():
+    nav()
+    ui.input('Введите путь').style('width: 400px').bind_value(global_data, 'PATH')
+    ui.input('Пароль', password=True).style('width: 400px').bind_value(global_data, 'PASS')
+    ui.button('Открыть', on_click=new_pm).style('width: 400px')
 
-        # Контейнер для фреймов (чтобы не пересоздавать окно)
-        self.container = ctk.CTkFrame(self, fg_color="transparent")
-        self.container.pack(fill="both", expand=True)
+@ui.page('/pm')
+def pass_manager():
+    nav()
 
-        self.current_frame = None  # Ссылка на текущий фрейм
+    with ui.row():
+        ui.input('Поиск по сайту')
+        ui.input('Поиск по логину')
+        ui.input('Поиск по тэгам')
 
-        self.show_OF()
+@ui.page('/gen')
+def pass_gen():
+    nav()
 
-    def clear_container(self):
-        """Удаляет текущий фрейм"""
-        if self.current_frame:
-            self.current_frame.destroy()
-            self.current_frame = None
-
-    def show_OF(self):
-        self.clear_container()
-        self.current_frame = OpenFrame(self.container, self.show_DF)
-        self.current_frame.pack(fill="both", expand=True)
-
-    def show_DF(self, filepath):
-        self.clear_container()
-        self.current_frame = DecryptFrame(self.container, filepath, self.show_OF, self.show_MF)
-        self.current_frame.pack(fill="both", expand=True)
-
-    def show_MF(self):
-        self.clear_container()
-        self.current_frame = ManagerFrame(self.container, self.show_OF)
-        self.current_frame.pack(fill="both", expand=True)
-
-
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+ui.run(native=True)
