@@ -2,12 +2,14 @@
 name = "sergeevpm"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 dependencies = [
     "aes-bridge>=2.0.4",
     "cryptography>=50.0.2",
     "customtkinter>=6.0.0",
+    "nicegui>=4.0.0",
     "pynacl>=1.6.2",
+    "pywebview>=6.2.1",
     "rapidfuzz>=3.14.5",
 ]
 

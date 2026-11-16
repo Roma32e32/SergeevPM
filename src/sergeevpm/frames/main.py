@@ -5,7 +5,7 @@ from tkinter import filedialog
 def open_file():
     filepath = filedialog.askopenfilename(
         title="Выберите файл",
-        filetypes=(("CSV", "*.csv"), ("Все файлы", "*.*"))
+        filetypes=(("PWM", "*.pwm"), ("Все файлы", "*.*"))
     )
     return filepath
 
