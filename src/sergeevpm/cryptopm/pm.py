@@ -9,7 +9,7 @@ from .search import search
 
 def check_password(data, password):
     decoded_password = decrypt(data, password).decode("utf-8")
-    lines = decoded_password.split('\n')
+    lines = decoded_password.split("\n")
     return lines[0] == "site;login;tags;pass"
 
 
@@ -18,7 +18,9 @@ class PM:
         self.__path = path
         self.__password = password
 
-        decrypted = decrypt(Path(path).read_text(encoding="utf-8"), self.__password).decode("utf-8")
+        decrypted = decrypt(
+            Path(path).read_text(encoding="utf-8"), self.__password
+        ).decode("utf-8")
         self.records = data_from_csv(decrypted)
 
     def save(self):
